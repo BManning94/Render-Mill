@@ -214,14 +214,34 @@ pub struct AppSettings {
     pub model_labels: std::collections::BTreeMap<String, ModelLabel>,
 }
 
+fn settings_base() -> Option<PathBuf> {
+    std::env::var_os("APPDATA").map(PathBuf::from).or_else(|| std::env::var_os("HOME").map(|h| PathBuf::from(h).join(".config")))
+}
+
 fn settings_path() -> Option<PathBuf> {
-    let base = std::env::var_os("APPDATA").map(PathBuf::from).or_else(|| std::env::var_os("HOME").map(|h| PathBuf::from(h).join(".config")))?;
-    Some(base.join("LumenCraft").join("settings.json"))
+    Some(settings_base()?.join("Render Mill").join("settings.json"))
+}
+
+/// Settings saved by LumenCraft (the app's name before 0.13.1).
+fn legacy_settings_path() -> Option<PathBuf> {
+    Some(settings_base()?.join("LumenCraft").join("settings.json"))
 }
 
 impl AppSettings {
     pub fn load() -> Self {
-        let mut s: AppSettings = settings_path().and_then(|p| std::fs::read_to_string(p).ok()).and_then(|t| serde_json::from_str(&t).ok()).unwrap_or_default();
+        // Fall back to the LumenCraft settings, so library folders, GPU choice
+        // and recent projects carry over after the rename.
+        let read = |p: Option<PathBuf>| p.and_then(|p| std::fs::read_to_string(p).ok()).and_then(|t| serde_json::from_str::<AppSettings>(&t).ok());
+        let mut s: AppSettings = match read(settings_path()) {
+            Some(s) => s,
+            None => match read(legacy_settings_path()) {
+                Some(s) => {
+                    s.save();
+                    s
+                }
+                None => AppSettings::default(),
+            },
+        };
         if !s.defaults_applied {
             // The user's texture collection, if it's on this machine.
             if let Some(home) = std::env::var_os("USERPROFILE").or_else(|| std::env::var_os("HOME")) {

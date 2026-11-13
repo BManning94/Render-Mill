@@ -109,7 +109,7 @@ impl LumenApp {
                 } else if self.world.source.is_some() {
                     "Replaces the current building model and keeps watching this file for changes."
                 } else {
-                    "LumenCraft keeps watching this file: export again from Revit and the scene updates."
+                    "Render Mill keeps watching this file: export again from Revit and the scene updates."
                 };
                 ui.label(RichText::new(note).size(11.0).color(theme::TEXT_DIM));
                 ui.add_space(8.0);

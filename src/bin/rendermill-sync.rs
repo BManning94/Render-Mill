@@ -1,4 +1,4 @@
-//! lumencraft-sync — push a model into a running LumenCraft over the LiveSync
+//! rendermill-sync — push a model into a running Render Mill over the LiveSync
 //! protocol, optionally re-sending whenever the file changes.
 //!
 //! This is also the reference client for BimCraft: it shows exactly which
@@ -10,11 +10,11 @@ use notify::Watcher;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
-const USAGE: &str = "lumencraft-sync <model.fbx|gltf|glb|obj> [--addr 127.0.0.1:47811] [--token 123456-789012] [--up y|z] [--units m|ft|in|mm|cm] [--watch]";
+const USAGE: &str = "rendermill-sync <model.fbx|gltf|glb|obj> [--addr 127.0.0.1:47811] [--token 123456-789012] [--up y|z] [--units m|ft|in|mm|cm] [--watch]";
 
 fn push(addr: &str, token: Option<&str>, path: &Path, settings: &ImportSettings) -> anyhow::Result<()> {
     let model = import::load(path, settings)?;
-    let mut c = SyncClient::connect_with_token(addr, "lumencraft-sync", token)?;
+    let mut c = SyncClient::connect_with_token(addr, "rendermill-sync", token)?;
     c.send(&Header::BeginScene { clear: true }, &[])?;
     for m in &model.materials {
         let p = &m.params;

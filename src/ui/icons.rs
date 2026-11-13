@@ -655,9 +655,17 @@ pub fn draw(p: &Painter, icon: Icon, rect: Rect, color: Color32) {
         Icon::ChevronDown => poly(p, vec![c + vec2(-r * 0.5, -r * 0.25), c + vec2(0.0, r * 0.25), c + vec2(r * 0.5, -r * 0.25)], false, s),
         Icon::ChevronRight => poly(p, vec![c + vec2(-r * 0.25, -r * 0.5), c + vec2(r * 0.25, 0.0), c + vec2(-r * 0.25, r * 0.5)], false, s),
         Icon::Logo => {
-            // stylised "L" with a light ray
-            poly(p, vec![c + vec2(-r * 0.5, -r * 0.85), c + vec2(-r * 0.5, r * 0.7), c + vec2(r * 0.55, r * 0.7)], false, Stroke::new(w * 1.6, color));
-            p.line_segment([c + vec2(-r * 0.1, r * 0.25), c + vec2(r * 0.6, -r * 0.55)], Stroke::new(w * 1.2, color));
+            // Render Mill: a windmill - tapered tower and four sails.
+            let hub = c + vec2(0.0, -r * 0.2);
+            poly(p, vec![c + vec2(-r * 0.32, r * 0.9), hub + vec2(-r * 0.14, 0.0), hub + vec2(r * 0.14, 0.0), c + vec2(r * 0.32, r * 0.9)], true, Stroke::new(w * 1.2, color));
+            for k in 0..4 {
+                let a = std::f32::consts::FRAC_PI_4 + k as f32 * std::f32::consts::FRAC_PI_2;
+                let d = vec2(a.cos(), a.sin());
+                let n = vec2(-d.y, d.x);
+                p.line_segment([hub, hub + d * r * 0.85], Stroke::new(w * 1.3, color));
+                // Sail cloth along one side of each arm.
+                p.line_segment([hub + d * r * 0.3 + n * r * 0.18, hub + d * r * 0.85 + n * r * 0.18], Stroke::new(w, color));
+            }
         }
         Icon::Random => {
             // magic wand with sparkles

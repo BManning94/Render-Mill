@@ -1,4 +1,4 @@
-# LumenCraft 0.11.0
+# Render Mill 0.13.1
 
 A real-time architectural renderer written in Rust (wgpu + egui), modeled on Lumion's workflow and interface.
 
@@ -52,14 +52,30 @@ The layout follows Lumion Pro 2025: a thin custom title bar, a narrow icon sideb
 
 Extract `lumencraft-0.7.0.zip` and every `lumencraft-library-…-0.7.0.zip` and `lumencraft-models-…-0.7.0.zip` part into the same place ("Extract here"). Together they make one `LumenCraft` folder holding `lumencraft.exe`, `library\` (materials) and `models\` (3D objects). Then run `LumenCraft\lumencraft.exe`.
 
-**Updating:** extract the newest `lumencraft-<version>.zip` into the same place, replacing `lumencraft.exe`.
+**Updating:** extract the newest `render-mill-<version>.zip` (`lumencraft-<version>.zip` up to 0.13.0) into the same place. From 0.13.1 run `RenderMill.exe`.
 
 **Updating from 0.7:** extract `lumencraft-0.8.0.zip` and both `lumencraft-denoiser-…-0.8.0.zip` parts into the same place as before, replacing `lumencraft.exe`. The library and models from 0.7 are unchanged. The denoiser parts add a `LumenCraft\denoiser\` folder (Intel Open Image Denoise, Apache 2.0); its large DLL is split in two and joined automatically the first time you render.
+
+## What's new in 0.13.1 — LumenCraft is now Render Mill
+
+The app is renamed **Render Mill**: the title bar, start screen, window name
+and messages say Render Mill, the program is `RenderMill.exe` and the LiveSync
+command-line tool is `rendermill-sync.exe`. Nothing else changes:
+
+- Projects are still `.lcproj` files and open as before.
+- Your settings (library folders, graphics card, recent projects, texture
+  budget) are carried over from LumenCraft automatically on first start; they
+  are now stored under `%APPDATA%\Render Mill`.
+- The LiveSync protocol is unchanged, so BimCraft and existing sync clients
+  keep working.
+- Environment variables keep their `LUMENCRAFT_` names.
+- The install folder can stay where it is; the old `lumencraft.exe` can be
+  deleted once `RenderMill.exe` works.
 
 ## What's new in 0.13 — start screen, landscape templates, smoother camera
 
 ### Start screen and landscape templates
-LumenCraft now opens on a start screen like Lumion's: **Create new**,
+Render Mill now opens on a start screen like Lumion's: **Create new**,
 **Example** (the demo house), **Load**, **Start from a Revit / 3D model**, and
 your recent projects. **Create new** shows nine landscape templates: Green
 meadow, Mountain valley, Lakeside, Forest clearing, Coast, Desert, Winter,
@@ -87,7 +103,7 @@ Projects from 0.12 open unchanged (flat ground). New optional
 ## What's new in 0.12 — GPU limits, texture budget, smoother live preview
 
 ### Photo and movie sizes checked against your graphics card
-Before a render starts, LumenCraft checks the chosen size against the card's
+Before a render starts, Render Mill checks the chosen size against the card's
 limits (largest texture, largest buffer, largest storage binding) and the
 buffers the path tracer needs at that size. If it can't fit, the render popup
 says why (for example "the sample buffer would need 265 MB; this card allows
@@ -111,8 +127,8 @@ The ray-traced live preview no longer waits for the GPU read-back or the
 denoiser: the image is resolved on the GPU, read back asynchronously and
 denoised on a worker thread while the previous image stays on screen. Only
 tone mapping runs when a new image arrives. Run **Measure-Preview.bat** (next
-to lumencraft.exe) to record refresh times on your card into
-`preview-benchmark.txt`; `lumencraft.exe --bench-preview [scene]` does the same
+to RenderMill.exe) to record refresh times on your card into
+`preview-benchmark.txt`; `RenderMill.exe --bench-preview [scene]` does the same
 from a terminal.
 
 ### Compatibility
@@ -163,7 +179,7 @@ Full engineering notes, test results and benchmarks: `docs/v0.11-engineering-rep
 ## What's new in 0.9
 
 ### Faster on your hardware
-- **Choose the graphics card** (Settings › Graphics card): pick your eGPU or the laptop GPU by name; LumenCraft remembers it and uses it on the next start. Command-line renders use the same choice (or `LUMENCRAFT_GPU=3090` for one run).
+- **Choose the graphics card** (Settings › Graphics card): pick your eGPU or the laptop GPU by name; Render Mill remembers it and uses it on the next start. Command-line renders use the same choice (or `LUMENCRAFT_GPU=3090` for one run).
 - On a dedicated graphics card the viewport now starts at full quality (4 of 4).
 - **Ray tracing is faster (about 2× in testing, more on fast cards):** each GPU dispatch traces many samples per pixel at once (tuned automatically to the card's speed, short enough to never trip the Windows GPU timeout — important over Thunderbolt), and the CPU no longer waits on the GPU between tiles.
 - **AI denoiser on the GPU:** Open Image Denoise now keeps one device for the session, so it runs on your NVIDIA card through CUDA without start-up cost each time (the log says which device it uses).
@@ -213,7 +229,7 @@ Ray tracing runs on any GPU through wgpu (DirectX 12 / Vulkan); it doesn't need 
 - **Clips.** Each clip is a camera path: move to a shot and press **+ Keyframe**, move again and add more. The camera follows a smooth curve through the keyframes and turns the short way round.
 - **Previewing.** Play the clip or scrub through it. Click a keyframe to jump to it; right-click it to update or delete it.
 - **Several clips.** Add clips with the filmstrip along the bottom; clips are saved in the project.
-- **Rendering.** The blue film button renders at 720p, 1080p or 4K and 24, 30 or 60 fps, at the highest quality, with a progress bar and a Cancel button. Each clip becomes a folder of PNG frames. If `ffmpeg.exe` sits next to `lumencraft.exe` or on your PATH, an MP4 (H.264) is made too.
+- **Rendering.** The blue film button renders at 720p, 1080p or 4K and 24, 30 or 60 fps, at the highest quality, with a progress bar and a Cancel button. Each clip becomes a folder of PNG frames. If `ffmpeg.exe` sits next to `RenderMill.exe` or on your PATH, an MP4 (H.264) is made too.
 - **Effects.** Photo-mode effects apply to movies, and clouds, water and plants animate over the clip.
 - **Command line:** `lumencraft --movie project.lcproj out-folder [--size 1920x1080] [--fps 30]`.
 
@@ -239,7 +255,7 @@ Ray tracing runs on any GPU through wgpu (DirectX 12 / Vulkan); it doesn't need 
 ### Material library (Material editor › Library)
 
 - **Materials.** About 270 free CC0 PBR materials ship with the app, each with colour, normal and roughness maps and a real-world size. They come from ambientCG and are grouped into 23 categories: brick, tiles, wood, wood floor, siding, concrete, paving, stone, marble, metal, roofing, plaster, fabric, ground, asphalt and others. The *Basic* category holds glass, water and light.
-- **My folders.** Your own texture folders are indexed in place; nothing is copied. Add or remove folders in Settings › Material library folders. LumenCraft also picks up `OneDrive\Documents\Work\WHD\Rendering\1. Lumion Textures` automatically on first start.
+- **My folders.** Your own texture folders are indexed in place; nothing is copied. Add or remove folders in Settings › Material library folders. Render Mill also picks up `OneDrive\Documents\Work\WHD\Rendering\1. Lumion Textures` automatically on first start.
   - Each sub-folder becomes one material, named after the folder.
   - Files named `-COLOR-`, `-NORMAL-`, `-ROUGHNESS-` or `-GLOSS-` are recognised, as in manufacturer and Arroway-style packs.
   - Previews, `COLOR_WITH_SHADOWS`, displacement and reflectivity maps are skipped.
@@ -336,9 +352,9 @@ You can also assign or replace any colour or normal map yourself in the material
 **FBX is Revit's built-in export, so no add-in is needed.**
 
 1. In Revit, choose **File → Export → FBX** and save into a folder, for example `C:\Renders\MyHouse\model.fbx`.
-2. In LumenCraft, open the **Import** category (bottom of the left bar) and click **Import model…**. You can also pick **Watch folder…**, which always shows the newest file in that folder.
+2. In Render Mill, open the **Import** category (bottom of the left bar) and click **Import model…**. You can also pick **Watch folder…**, which always shows the newest file in that folder.
 3. Edit materials, place objects and lights, and set up views.
-4. Change the design in Revit and export again over the same file. LumenCraft reloads it automatically and keeps your materials, objects and camera.
+4. Change the design in Revit and export again over the same file. Render Mill reloads it automatically and keeps your materials, objects and camera.
 
 How the re-sync works:
 
@@ -353,15 +369,15 @@ Revit still needs an export click. Updating without one would require a Revit ad
 
 The server listens on `127.0.0.1:47811` by default.
 
-**Other computers:** tick "Allow other computers on the network" and they must send the pairing code shown in the panel. Connections from the same PC never need it. A remote client can't make LumenCraft read local files, and frames are capped at 256 MB.
+**Other computers:** tick "Allow other computers on the network" and they must send the pairing code shown in the panel. Connections from the same PC never need it. A remote client can't make Render Mill read local files, and frames are capped at 256 MB.
 
 **Protocol:** the spec and a client live in `src/protocol.rs`. The file depends only on serde, so BimCraft can copy it directly. Meshes are upserted by element id, so the host only needs to send the elements that changed.
 
-The `lumencraft-sync` binary is the reference client:
+The `rendermill-sync` binary is the reference client:
 
 ```
-lumencraft-sync model.fbx --watch
-lumencraft-sync model.fbx --addr 192.168.1.20:47811 --token 123456-789012
+rendermill-sync model.fbx --watch
+rendermill-sync model.fbx --addr 192.168.1.20:47811 --token 123456-789012
 ```
 
 ## Controls

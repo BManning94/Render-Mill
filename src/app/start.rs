@@ -74,7 +74,7 @@ impl LumenApp {
             }
             if let Some(id) = &loading {
                 let name = TEMPLATES.iter().find(|t| t.id == id).map_or("project", |t| t.name);
-                p.text(full.center() + vec2(0.0, -12.0), Align2::CENTER_CENTER, "LumenCraft", egui::FontId::proportional(34.0), theme::TEXT);
+                p.text(full.center() + vec2(0.0, -12.0), Align2::CENTER_CENTER, crate::APP_NAME, egui::FontId::proportional(34.0), theme::TEXT);
                 p.text(
                     full.center() + vec2(0.0, 26.0),
                     Align2::CENTER_CENTER,
@@ -88,7 +88,7 @@ impl LumenApp {
             let card_w = if page == StartPage::Home { 440.0 } else { 640.0 };
             egui::Area::new(egui::Id::new("start_card")).anchor(Align2::CENTER_CENTER, vec2(0.0, 0.0)).show(ctx, |ui| {
                 ui.vertical_centered(|ui| {
-                    ui.label(RichText::new("LumenCraft").size(34.0).color(theme::TEXT));
+                    ui.label(RichText::new(crate::APP_NAME).size(34.0).color(theme::TEXT));
                     ui.add_space(14.0);
                 });
                 theme::panel_frame().inner_margin(egui::Margin::same(16.0)).show(ui, |ui| {
@@ -122,7 +122,7 @@ impl LumenApp {
                 self.start_page = None;
             }
             if widgets::flat_button(ui, Some(Icon::Folder), "Load", false, w).clicked() {
-                if let Some(p) = rfd::FileDialog::new().add_filter("LumenCraft project", &["lcproj"]).pick_file() {
+                if let Some(p) = rfd::FileDialog::new().add_filter("Render Mill project", &["lcproj"]).pick_file() {
                     self.open_project(p);
                     self.start_page = None;
                 }

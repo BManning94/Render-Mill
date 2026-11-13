@@ -280,7 +280,7 @@ const DOLLY_TAU: f32 = 0.15;
 
 impl LumenApp {
     pub fn new(cc: &eframe::CreationContext<'_>, open: Option<PathBuf>) -> Self {
-        let rs = cc.wgpu_render_state.as_ref().expect("LumenCraft needs the wgpu backend");
+        let rs = cc.wgpu_render_state.as_ref().expect("Render Mill needs the wgpu backend");
         let renderer = Renderer::new(rs.device.clone(), rs.queue.clone());
         let slot_targets = renderer.create_targets(256, 144);
         let thumbs = Thumbs::new(rs.device.clone(), rs.queue.clone());
@@ -784,7 +784,7 @@ impl LumenApp {
 
     fn save_project(&mut self, ask: bool) {
         let path = if ask || self.project_path.is_none() {
-            rfd::FileDialog::new().add_filter("LumenCraft project", &["lcproj"]).set_file_name("scene.lcproj").save_file()
+            rfd::FileDialog::new().add_filter("Render Mill project", &["lcproj"]).set_file_name("scene.lcproj").save_file()
         } else {
             self.project_path.clone()
         };

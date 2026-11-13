@@ -68,7 +68,7 @@ impl LumenApp {
             p.text(
                 pos2(rect.left() + 44.0, rect.center().y),
                 Align2::LEFT_CENTER,
-                format!("LumenCraft Pro {}{project}", env!("CARGO_PKG_VERSION")),
+                format!("{} {}{project}", crate::APP_NAME, env!("CARGO_PKG_VERSION")),
                 egui::FontId::proportional(12.5),
                 theme::TEXT,
             );
@@ -312,7 +312,7 @@ impl LumenApp {
             self.show_new_project_page();
         }
         if item(ui, Icon::Folder, "Open project...") {
-            if let Some(p) = rfd::FileDialog::new().add_filter("LumenCraft project", &["lcproj"]).pick_file() {
+            if let Some(p) = rfd::FileDialog::new().add_filter("Render Mill project", &["lcproj"]).pick_file() {
                 self.open_project(p);
             }
         }
@@ -372,7 +372,7 @@ impl LumenApp {
         theme::section_title(ui, "Graphics card");
         ui.label(RichText::new(format!("In use: {}", self.gpu_in_use)).size(11.5));
         ui.label(
-            RichText::new("Pick the card LumenCraft renders on (e.g. your eGPU or the laptop GPU). Takes effect after a restart.")
+            RichText::new("Pick the card Render Mill renders on (e.g. your eGPU or the laptop GPU). Takes effect after a restart.")
                 .size(11.0)
                 .color(theme::TEXT_DIM),
         );
@@ -393,7 +393,7 @@ impl LumenApp {
             }
         }
         if self.gpu_changed {
-            ui.label(RichText::new("Restart LumenCraft to switch graphics card.").size(11.0).color(theme::WARN));
+            ui.label(RichText::new("Restart Render Mill to switch graphics card.").size(11.0).color(theme::WARN));
         }
         ui.add_space(8.0);
         theme::section_title(ui, "Texture memory");

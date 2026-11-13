@@ -314,7 +314,7 @@ pub fn run_preview(scene: &str, width: u32, height: u32, seconds: f32) -> Result
         p.recycle(&mut tracer);
     }
     let mut out = format!(
-        "LumenCraft live-preview benchmark\nscene={scene} size={width}x{height} seconds_per_mode={seconds}\ngpu=\"{gpu}\"\nlimits: max_buffer={} MB, max_storage_binding={} MB, max_texture_2d={}, max_texture_layers={}\nAI denoiser available: {}\n\n",
+        "Render Mill live-preview benchmark\nscene={scene} size={width}x{height} seconds_per_mode={seconds}\ngpu=\"{gpu}\"\nlimits: max_buffer={} MB, max_storage_binding={} MB, max_texture_2d={}, max_texture_layers={}\nAI denoiser available: {}\n\n",
         limits.max_buffer_size >> 20,
         limits.max_storage_buffer_binding_size >> 20,
         limits.max_texture_dimension_2d,

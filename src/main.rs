@@ -2,20 +2,20 @@
 
 use std::path::PathBuf;
 
-const USAGE: &str = "LumenCraft — real-time architectural renderer with live sync
+const USAGE: &str = "Render Mill — real-time architectural renderer with live sync
 
 USAGE:
-  lumencraft                          open with the demo scene
-  lumencraft <model.gltf|glb|obj>     open a model and live-sync it
-  lumencraft <export-folder>          watch a folder, always showing the newest export
-  lumencraft <project.lcproj>         open a saved project
-  lumencraft --render <input|--demo> <out.png> [--size 1920x1080] [--view N]
+  RenderMill                          open the start screen
+  RenderMill <model.gltf|glb|obj>     open a model and live-sync it
+  RenderMill <export-folder>          watch a folder, always showing the newest export
+  RenderMill <project.lcproj>         open a saved project
+  RenderMill --render <input|--demo> <out.png> [--size 1920x1080] [--view N]
              [--preset \"Golden hour\"] [--camera ex,ey,ez,tx,ty,tz]
              [--raytrace fast|high|ultra|max|<samples>] [--no-denoise]
                                       render an image without opening a window
-  lumencraft --bench-pt <small-exterior|large-exterior|interior|large-model|all> [--size 1280x720] [--spp 64] [--out DIR]
+  RenderMill --bench-pt <small-exterior|large-exterior|interior|large-model|all> [--size 1280x720] [--spp 64] [--out DIR]
                                       path-tracing benchmark (time, samples/s, GPU memory)
-  lumencraft --movie <input|--demo> <out-folder> [--size 1280x720] [--fps 30] [--seconds 8]
+  RenderMill --movie <input|--demo> <out-folder> [--size 1280x720] [--fps 30] [--seconds 8]
                                       render the project's movie clips (or an orbit)
                                       to PNG frames + MP4 when ffmpeg is available";
 
@@ -266,7 +266,7 @@ fn main() {
     let options = eframe::NativeOptions {
         renderer: eframe::Renderer::Wgpu,
         viewport: egui::ViewportBuilder::default()
-            .with_title("LumenCraft")
+            .with_title(lumencraft::APP_NAME)
             .with_inner_size([1600.0, 950.0])
             .with_min_inner_size([1100.0, 680.0])
             // Lumion-style custom title bar (drawn by the app).
@@ -295,8 +295,8 @@ fn main() {
         },
         ..Default::default()
     };
-    if let Err(e) = eframe::run_native("LumenCraft", options, Box::new(move |cc| Ok(Box::new(lumencraft::app::LumenApp::new(cc, open))))) {
-        eprintln!("LumenCraft failed to start: {e}");
+    if let Err(e) = eframe::run_native(lumencraft::APP_NAME, options, Box::new(move |cc| Ok(Box::new(lumencraft::app::LumenApp::new(cc, open))))) {
+        eprintln!("Render Mill failed to start: {e}");
         std::process::exit(1);
     }
 }

@@ -213,7 +213,7 @@ impl LumenApp {
         match find_ffmpeg() {
             Some(_) => ui.label(RichText::new("ffmpeg found: clips are also saved as MP4.").size(11.0).color(theme::GOOD)),
             None => ui.label(
-                RichText::new("Clips render to numbered PNG frames. Put ffmpeg.exe next to lumencraft.exe (or on PATH) to also get MP4 files.")
+                RichText::new("Clips render to numbered PNG frames. Put ffmpeg.exe next to RenderMill.exe (or on PATH) to also get MP4 files.")
                     .size(11.0)
                     .color(theme::TEXT_DIM),
             ),

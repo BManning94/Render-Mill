@@ -610,7 +610,7 @@ pub const TEMPLATES: [Template; 9] = [
     Template { id: "desert", name: "Desert", description: "Sand, rocks and shrubs under a clear sky" },
     Template { id: "winter", name: "Winter", description: "Snow, conifers and a low sun" },
     Template { id: "evening", name: "Golden hour", description: "Meadow at sunset" },
-    Template { id: "flat", name: "Flat lawn", description: "Plain lawn and backdrop (classic LumenCraft)" },
+    Template { id: "flat", name: "Flat lawn", description: "Plain lawn and backdrop (the original flat setup)" },
 ];
 
 /// Landscape and environment for a template id.

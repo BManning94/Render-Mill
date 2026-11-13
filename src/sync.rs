@@ -256,8 +256,11 @@ fn handle_client(stream: TcpStream, token: &str, ev: &Sender<SyncEvent>, wake: &
         match h {
             Header::Hello { client: c, version, token: t } => {
                 if !local && t.as_deref() != Some(token) {
-                    let _ =
-                        protocol::write_frame(&mut writer, &Header::Error { message: "wrong or missing pairing code (see LumenCraft > LiveSync)".into() }, &[]);
+                    let _ = protocol::write_frame(
+                        &mut writer,
+                        &Header::Error { message: "wrong or missing pairing code (see Render Mill > LiveSync)".into() },
+                        &[],
+                    );
                     return Err(std::io::Error::new(std::io::ErrorKind::PermissionDenied, "bad pairing code"));
                 }
                 authed = true;
