@@ -1,0 +1,46 @@
+[package]
+name = "lumencraft"
+version = "0.13.0"
+edition = "2021"
+description = "Real-time architectural visualization renderer with live sync"
+
+[dependencies]
+eframe = { version = "0.29", default-features = false, features = ["wgpu", "default_fonts", "x11", "wayland"] }
+egui = "0.29"
+egui-wgpu = "0.29"
+wgpu = "22"
+glam = { version = "0.29", features = ["bytemuck", "serde"] }
+bytemuck = { version = "1", features = ["derive"] }
+gltf = { version = "1.4", features = ["KHR_materials_emissive_strength", "KHR_materials_transmission"] }
+tobj = "4"
+notify = "6"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "bmp", "tga", "tiff", "gif", "webp", "dds"] }
+base64 = "0.22"
+rfd = "0.15"
+pollster = "0.3"
+anyhow = "1"
+flate2 = "1"
+log = "0.4"
+env_logger = "0.11"
+libloading = "0.8"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+
+[profile.dev]
+opt-level = 1
+[profile.dev.package."*"]
+opt-level = 2
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.52", features = ["Win32_System_Console"] }
+
+[dev-dependencies]
+# Offline WGSL validation of every shader (same naga version wgpu 22 uses).
+naga = { version = "22", features = ["wgsl-in"] }
+
+[patch.crates-io]
+egui-wgpu = { path = "vendor/egui-wgpu" }
