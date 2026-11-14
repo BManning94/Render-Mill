@@ -326,6 +326,9 @@ impl LumenApp {
         if item(ui, Icon::Import, "Import model (FBX, glTF, OBJ)...") {
             self.open_model_dialog();
         }
+        if item(ui, Icon::Photo, "Match materials from a photo...") {
+            self.start_photo_match();
+        }
         if item(ui, Icon::Materials, "Import textures...") {
             self.import_textures_dialog();
         }

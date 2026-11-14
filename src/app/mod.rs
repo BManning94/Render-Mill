@@ -10,6 +10,7 @@ mod movie;
 pub use movie::find_ffmpeg;
 mod import_dialog;
 mod photo;
+mod photo_match;
 mod raytrace;
 mod start;
 
@@ -250,6 +251,9 @@ pub struct LumenApp {
     /// A project is open behind the start screen (Esc goes back to it).
     start_can_close: bool,
     import_dialog: Option<import_dialog::ImportDialog>,
+    photo_match: Option<photo_match::PhotoMatch>,
+    /// Textures dropped this frame, freed next frame (after they were drawn).
+    retired_textures: Vec<egui::TextureHandle>,
     photo_lock: bool,
     movie: movie::MovieState,
     rt: raytrace::RtState,
@@ -386,6 +390,8 @@ impl LumenApp {
             start_loading_drawn: false,
             start_can_close: false,
             import_dialog: None,
+            photo_match: None,
+            retired_textures: Vec::new(),
             photo_lock: false,
             movie: movie::MovieState::default(),
             rt: raytrace::RtState::default(),
@@ -419,6 +425,11 @@ impl LumenApp {
         app.start_server();
         match open {
             Some(p) if p.extension().is_some_and(|e| e == "lcproj") => app.open_project(p),
+            // A photo: start screen, then the material match for it.
+            Some(p) if crate::import::is_image(&p) => {
+                app.start_page = Some(start::StartPage::Home);
+                app.photo_match_file(p);
+            }
             Some(p) => app.start_file_sync(p),
             None => {
                 // Lumion-style start screen: pick a landscape template, the
@@ -1828,6 +1839,7 @@ impl LumenApp {
 
 impl eframe::App for LumenApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        self.retired_textures.clear();
         let now = Instant::now();
         self.frame_times.push_back((now - self.last_frame).as_secs_f32());
         self.last_frame = now;
@@ -1888,6 +1900,7 @@ impl eframe::App for LumenApp {
         }
         self.side_panels(ctx);
         self.import_dialog_ui(ctx);
+        self.photo_match_ui(ctx);
         self.toast(ctx);
 
         if self.world.env.animate {

@@ -349,6 +349,12 @@ impl LumenApp {
                     if widgets::flat_button(ui, Some(Icon::Plus), "Import textures...", false, 170.0).clicked() {
                         self.import_textures_dialog();
                     }
+                    if widgets::flat_button(ui, Some(Icon::Photo), "Match from photo...", false, 170.0)
+                        .on_hover_text("Pick a photo of a house: its materials are recognised and the closest library textures applied to your model")
+                        .clicked()
+                    {
+                        self.start_photo_match();
+                    }
                 });
                 ui.add_space(8.0);
                 ui.vertical(|ui| {

@@ -657,7 +657,12 @@ pub fn draw(p: &Painter, icon: Icon, rect: Rect, color: Color32) {
         Icon::Logo => {
             // Render Mill: a windmill - tapered tower and four sails.
             let hub = c + vec2(0.0, -r * 0.2);
-            poly(p, vec![c + vec2(-r * 0.32, r * 0.9), hub + vec2(-r * 0.14, 0.0), hub + vec2(r * 0.14, 0.0), c + vec2(r * 0.32, r * 0.9)], true, Stroke::new(w * 1.2, color));
+            poly(
+                p,
+                vec![c + vec2(-r * 0.32, r * 0.9), hub + vec2(-r * 0.14, 0.0), hub + vec2(r * 0.14, 0.0), c + vec2(r * 0.32, r * 0.9)],
+                true,
+                Stroke::new(w * 1.2, color),
+            );
             for k in 0..4 {
                 let a = std::f32::consts::FRAC_PI_4 + k as f32 * std::f32::consts::FRAC_PI_2;
                 let d = vec2(a.cos(), a.sin());

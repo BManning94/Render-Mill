@@ -131,6 +131,18 @@ fn main() {
         }
         return;
     }
+    if args.first().map(String::as_str) == Some("--match-photo") {
+        // --match-photo <photo> <texture folder> [<out overlay.png>]: regions and closest textures.
+        let (Some(photo), Some(dir)) = (args.get(1), args.get(2)) else {
+            eprintln!("usage: --match-photo <photo> <texture folder> [overlay.png]");
+            std::process::exit(2);
+        };
+        if let Err(e) = lumencraft::photomatch::cli(std::path::Path::new(photo), std::path::Path::new(dir), args.get(3).map(std::path::Path::new)) {
+            eprintln!("{e}");
+            std::process::exit(1);
+        }
+        return;
+    }
     if args.first().map(String::as_str) == Some("--bench") {
         let input = args.get(1).cloned().unwrap_or_else(|| "--demo".into());
         let (mut w, mut h, mut frames, mut q) = (1280, 720, 20, None);

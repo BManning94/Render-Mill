@@ -218,6 +218,11 @@ fn settings_base() -> Option<PathBuf> {
     std::env::var_os("APPDATA").map(PathBuf::from).or_else(|| std::env::var_os("HOME").map(|h| PathBuf::from(h).join(".config")))
 }
 
+/// Folder for Render Mill's own data (settings, caches).
+pub fn data_dir() -> Option<PathBuf> {
+    Some(settings_base()?.join("Render Mill"))
+}
+
 fn settings_path() -> Option<PathBuf> {
     Some(settings_base()?.join("Render Mill").join("settings.json"))
 }

@@ -1,4 +1,4 @@
-# Render Mill 0.13.1
+# Render Mill 0.14.0
 
 A real-time architectural renderer written in Rust (wgpu + egui), modeled on Lumion's workflow and interface.
 
@@ -55,6 +55,31 @@ Extract `lumencraft-0.7.0.zip` and every `lumencraft-library-…-0.7.0.zip` and 
 **Updating:** extract the newest `render-mill-<version>.zip` (`lumencraft-<version>.zip` up to 0.13.0) into the same place. From 0.13.1 run `RenderMill.exe`.
 
 **Updating from 0.7:** extract `lumencraft-0.8.0.zip` and both `lumencraft-denoiser-…-0.8.0.zip` parts into the same place as before, replacing `lumencraft.exe`. The library and models from 0.7 are unchanged. The denoiser parts add a `LumenCraft\denoiser\` folder (Intel Open Image Denoise, Apache 2.0); its large DLL is split in two and joined automatically the first time you render.
+
+## What's new in 0.14 — match materials from a photo
+
+**Match from photo…** (Materials tab, or File menu) takes a photo of a house
+and finds its materials in your library:
+
+1. Pick a photo (JPG, PNG, WebP, TIFF...). Render Mill splits it into the
+   materials it sees - siding, brick, roof, trim, paving - and tints each
+   region in the preview (sky and plants are recognised and left out).
+2. For every region it lists the closest textures from the built-in library
+   and your own texture folders, with a similarity score. Click the photo or
+   the list to pick a region, click a texture to choose a different match.
+3. Each region is pointed at the model material whose name fits (a "Siding"
+   match goes to your Revit "Siding - Lap" material, for example); change it
+   in **Apply to**. **Apply** or **Apply all** puts the textures on the model.
+   Undo works as usual.
+
+It runs on this computer with image analysis of colour and texture (edge
+strength, line direction such as siding courses, fine-scale variation) - no
+cloud service, nothing uploaded. The first run "learns" every library texture
+once (a few seconds for the built-in library, longer for big folders) and
+caches it. Matches depend on the photo and on what is in your library:
+treat them as suggestions and check them. You can also start Render Mill with
+a photo (`RenderMill.exe house.jpg`), or test from a terminal with
+`RenderMill.exe --match-photo house.jpg <texture folder> [overlay.png]`.
 
 ## What's new in 0.13.1 — LumenCraft is now Render Mill
 
