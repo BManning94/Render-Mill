@@ -1,10 +1,10 @@
 # Render Mill 0.16.0
 
-A real-time architectural renderer written in Rust (wgpu + egui), modeled on Lumion's workflow and interface.
+A real-time architectural renderer written in Rust (wgpu + egui), modeled on Lumen's workflow and interface.
 
-## Interface (v0.5: Lumion 2025 layout)
+## Interface (v0.5: Lumen 2025 layout)
 
-The layout follows Lumion Pro 2025: a thin custom title bar, a narrow icon sidebar on the left, a full-screen viewport, and flat charcoal panels.
+The layout follows Lumen Pro 2025: a thin custom title bar, a narrow icon sidebar on the left, a full-screen viewport, and flat charcoal panels.
 
 - **Title bar.** Project name, a frame-rate gauge (green, amber or red, with GPU time on hover), quality stars (F1-F4), and minimise / maximise / close. Drag the bar to move the window, double-click it to maximise, and drag the window edges to resize.
 - **Left sidebar.** File (new, open, save, import), Build mode, Photo mode, and Imported model / LiveSync. At the bottom are the Activity log, Settings (quality, auto-resolution, walk speed, LiveSync server) and Help (shortcuts).
@@ -24,7 +24,7 @@ The layout follows Lumion Pro 2025: a thin custom title bar, a narrow icon sideb
 - **Material editor** (brush tab).
   - **Picking a surface.** Hover a surface to highlight it in yellow with its name, then click it. The surface being edited is tinted blue.
   - **Panel tabs.** The panel has **Library** and **Settings** tabs.
-  - **Value bars.** The bars, as in Lumion, are Color, Texture, Map scale, Relief, Roughness, Reflectivity and Metalness.
+  - **Value bars.** The bars, as in Lumen, are Color, Texture, Map scale, Relief, Roughness, Reflectivity and Metalness.
   - **Map swatches.** Click a swatch to load a map; hover it to see a large preview with its size and file name.
   - **Show more / Show less** toggles the extra bars.
   - **Sections.** Advanced (type, opacity, glow, cut-out), Placement (X/Y offset, heading, *Enable landscape tiling*), Weathering, and Imported material (reset or Invisible).
@@ -59,41 +59,41 @@ Extract `lumencraft-0.7.0.zip` and every `lumencraft-library-…-0.7.0.zip` and 
 ## What's new in 0.16 — COLLADA (.dae) models
 
 Render Mill opens COLLADA `.dae` files: Import model, Start from a Revit / 3D
-model, or drag the file onto the window. This is the format Lumion LiveSync
+model, or drag the file onto the window. This is the format Lumen LiveSync
 for Revit, SketchUp, ArchiCAD and 3ds Max export.
 
 - Units and up axis come from the file, so models arrive at the right size and
   the right way up (Units and Up axis in the import dialog can override them).
 - Node hierarchies, instanced parts and per-object material assignments.
 - Colours, textures, transparency (glass) and shininess. For files from
-  Lumion's Revit exporter, its extra settings are used too: albedo colour and
+  Lumen's Revit exporter, its extra settings are used too: albedo colour and
   map, normal map, roughness, reflectiveness and material type.
 - Textures are found from the paths in the file, or by file name next to the
   .dae (for example the `<model>_Textures` folder) if it has been moved.
 - Like FBX, a `.dae` imported as the building is watched: export again and the
   scene updates.
 
-## What's new in 0.15 — open Lumion files
+## What's new in 0.15 — open Lumen files
 
-Render Mill opens Lumion's own files (File › Open project, the start screen's
+Render Mill opens Lumen's own files (File › Open project, the start screen's
 **Load**, or drag the file onto the window):
 
-- **Lumion scenes (.lsf, and Lumion's quick-save .lqf):** your imported
-  models where you placed them, the Lumion material settings on them (colour
+- **Lumen scenes (.lsf, and Lumen's quick-save .lqf):** your imported
+  models where you placed them, the Lumen material settings on them (colour
   tints, roughness, metalness, transparency, and textures you added yourself),
   every saved camera view (Photo mode views and the first key of each movie
   clip), and the sun position.
-- **Lumion's library objects** (trees, plants, people, cars, furniture,
-  lights) are Lumion's licensed content, so they aren't copied: each one is
+- **Lumen's library objects** (trees, plants, people, cars, furniture,
+  lights) are Lumen's licensed content, so they aren't copied: each one is
   replaced by Render Mill's nearest object at the same spot, size and
-  rotation. When Lumion is installed on the same computer, Render Mill reads
+  rotation. When Lumen is installed on the same computer, Render Mill reads
   the names of its catalogue folders to tell a tree from a plant or a car.
   Grass clumps, landscape paint, text and effects are left out (Render Mill
   draws its own), and the activity log lists what wasn't brought over.
-- **Lumion library materials** (Wood siding 003, Concrete 010...) are swapped
+- **Lumen library materials** (Wood siding 003, Concrete 010...) are swapped
   for the closest Render Mill library material by name and kind.
-- **Imported models from Lumion's library folder (.lib)**, e.g.
-  `Documents\Lumion 2026\Library\Kapp.lib`, open like any other model
+- **Imported models from Lumen's library folder (.lib)**, e.g.
+  `Documents\Lumen 2026\Library\Kapp.lib`, open like any other model
   (Import model or Start from a model).
 
 The file format isn't published, so it was worked out from your own files;
@@ -143,7 +143,7 @@ command-line tool is `rendermill-sync.exe`. Nothing else changes:
 ## What's new in 0.13 — start screen, landscape templates, smoother camera
 
 ### Start screen and landscape templates
-Render Mill now opens on a start screen like Lumion's: **Create new**,
+Render Mill now opens on a start screen like Lumen's: **Create new**,
 **Example** (the demo house), **Load**, **Start from a Revit / 3D model**, and
 your recent projects. **Create new** shows nine landscape templates: Green
 meadow, Mountain valley, Lakeside, Forest clearing, Coast, Desert, Winter,
@@ -323,7 +323,7 @@ Ray tracing runs on any GPU through wgpu (DirectX 12 / Vulkan); it doesn't need 
 ### Material library (Material editor › Library)
 
 - **Materials.** About 270 free CC0 PBR materials ship with the app, each with colour, normal and roughness maps and a real-world size. They come from ambientCG and are grouped into 23 categories: brick, tiles, wood, wood floor, siding, concrete, paving, stone, marble, metal, roofing, plaster, fabric, ground, asphalt and others. The *Basic* category holds glass, water and light.
-- **My folders.** Your own texture folders are indexed in place; nothing is copied. Add or remove folders in Settings › Material library folders. Render Mill also picks up `OneDrive\Documents\Work\WHD\Rendering\1. Lumion Textures` automatically on first start.
+- **My folders.** Your own texture folders are indexed in place; nothing is copied. Add or remove folders in Settings › Material library folders. Render Mill also picks up `OneDrive\Documents\Work\WHD\Rendering\1. Lumen Textures` automatically on first start.
   - Each sub-folder becomes one material, named after the folder.
   - Files named `-COLOR-`, `-NORMAL-`, `-ROUGHNESS-` or `-GLOSS-` are recognised, as in manufacturer and Arroway-style packs.
   - Previews, `COLOR_WITH_SHADOWS`, displacement and reflectivity maps are skipped.
@@ -340,7 +340,7 @@ Ray tracing runs on any GPU through wgpu (DirectX 12 / Vulkan); it doesn't need 
   - SSAO, bloom, ACES tone mapping, height fog and 4× MSAA.
 - **Lights:** point and spot lights you can place, plus street lamps that actually light the scene (up to 256 lights).
 - **Materials:** Standard, Glass, Water (animated), Emissive, Foliage (wind sway) and Landscape. Revit material names are recognized automatically, and there's a preset library.
-- **Material edits persist by name across every re-sync**, just as in Lumion LiveSync.
+- **Material edits persist by name across every re-sync**, just as in Lumen LiveSync.
 - **Objects:** procedural trees, conifers, shrubs, planters, boulders, people, cars, armchairs, sofas, dining tables, chairs, park benches, street lamps and point/spot lights. You can place one at a time, paint them along a path, or mass-place them, then move, rotate and scale whole selections.
 - **Weather presets:** midday, golden hour, overcast, morning, dusk and night.
 - **Photo:** saved views and PNG export up to 4K. Projects save as `.lcproj` (JSON).
