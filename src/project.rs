@@ -74,6 +74,32 @@ impl Project {
 }
 
 /// Live state: the scene plus everything the user has set up around it.
+/// What came across from a Lumion scene.
+#[derive(Debug, Default)]
+pub struct LumionReport {
+    pub models: usize,
+    pub instances: usize,
+    pub objects: usize,
+    pub skipped: Vec<(String, usize)>,
+    pub views: usize,
+    /// (model material, Lumion library material name) to match in the library.
+    pub library_hints: Vec<(String, String)>,
+}
+
+impl LumionReport {
+    pub fn summary(&self) -> String {
+        let skipped: usize = self.skipped.iter().map(|s| s.1).sum();
+        let mut s = format!(
+            "Lumion scene: {} model(s) placed {} time(s), {} Lumion object(s) replaced with Render Mill's, {} camera view(s)",
+            self.models, self.instances, self.objects, self.views
+        );
+        if skipped > 0 {
+            s += &format!(", {skipped} left out (grass clumps, landscape paint, effects and other items Render Mill draws its own way)");
+        }
+        s
+    }
+}
+
 pub struct World {
     pub scene: Scene,
     pub objects: Vec<PlacedObject>,
@@ -418,6 +444,45 @@ impl World {
     }
 
     /// Load a model synchronously (headless mode / tests).
+    /// Open a Lumion scene (.lsf/.lqf): the imported models where they stood,
+    /// Lumion's library objects swapped for Render Mill's, camera views and
+    /// the sun. Returns what came across, for the activity log.
+    pub fn open_lumion_scene(&mut self, path: &Path) -> anyhow::Result<LumionReport> {
+        let scene = crate::lumion::read_scene(path)?;
+        let settings = self.import.clone().unwrap_or_else(|| ImportSettings::default_for(path));
+        let mut report = LumionReport {
+            models: scene.models.len(),
+            instances: scene.instances.len(),
+            objects: scene.objects.len(),
+            skipped: scene.skipped.clone(),
+            views: scene.cameras.len(),
+            library_hints: scene.models.iter().flat_map(|m| m.library_hints.clone()).collect(),
+        };
+        if !scene.instances.is_empty() {
+            let (parts, mats) = crate::lumion::scene_meshes(&scene);
+            let hints = import::FileHints { up: Some(import::UpAxis::Y), scale_to_m: Some(1.0) };
+            let model = import::finish(parts, mats, hints, &settings, Vec::new());
+            self.import = Some(settings);
+            self.source = Some(path.to_path_buf());
+            self.apply(SyncEvent::FileLoaded { path: path.to_path_buf(), model, millis: 0 });
+        }
+        self.objects.extend(scene.objects);
+        self.rebuild_objects();
+        for c in &scene.cameras {
+            self.views.push(SavedView { name: c.name.clone(), camera: c.camera.clone() });
+        }
+        // Start on the first saved photo view (else the first clip).
+        if let Some(c) = scene.cameras.iter().find(|c| c.name.starts_with("Lumion view")).or(scene.cameras.first()) {
+            self.camera = c.camera.clone();
+        }
+        if let Some((h, p)) = scene.sun {
+            self.env.sun_heading = h;
+            self.env.sun_height = p;
+        }
+        report.models = report.models.max(scene.models.len());
+        Ok(report)
+    }
+
     pub fn load_model_now(&mut self, path: &Path) -> anyhow::Result<()> {
         let settings = self.import.clone().unwrap_or_else(|| ImportSettings::default_for(path));
         let model = import::load(path, &settings)?;

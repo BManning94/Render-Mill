@@ -1,4 +1,4 @@
-# Render Mill 0.14.0
+# Render Mill 0.15.0
 
 A real-time architectural renderer written in Rust (wgpu + egui), modeled on Lumion's workflow and interface.
 
@@ -55,6 +55,32 @@ Extract `lumencraft-0.7.0.zip` and every `lumencraft-library-…-0.7.0.zip` and 
 **Updating:** extract the newest `render-mill-<version>.zip` (`lumencraft-<version>.zip` up to 0.13.0) into the same place. From 0.13.1 run `RenderMill.exe`.
 
 **Updating from 0.7:** extract `lumencraft-0.8.0.zip` and both `lumencraft-denoiser-…-0.8.0.zip` parts into the same place as before, replacing `lumencraft.exe`. The library and models from 0.7 are unchanged. The denoiser parts add a `LumenCraft\denoiser\` folder (Intel Open Image Denoise, Apache 2.0); its large DLL is split in two and joined automatically the first time you render.
+
+## What's new in 0.15 — open Lumion files
+
+Render Mill opens Lumion's own files (File › Open project, the start screen's
+**Load**, or drag the file onto the window):
+
+- **Lumion scenes (.lsf, and Lumion's quick-save .lqf):** your imported
+  models where you placed them, the Lumion material settings on them (colour
+  tints, roughness, metalness, transparency, and textures you added yourself),
+  every saved camera view (Photo mode views and the first key of each movie
+  clip), and the sun position.
+- **Lumion's library objects** (trees, plants, people, cars, furniture,
+  lights) are Lumion's licensed content, so they aren't copied: each one is
+  replaced by Render Mill's nearest object at the same spot, size and
+  rotation. When Lumion is installed on the same computer, Render Mill reads
+  the names of its catalogue folders to tell a tree from a plant or a car.
+  Grass clumps, landscape paint, text and effects are left out (Render Mill
+  draws its own), and the activity log lists what wasn't brought over.
+- **Lumion library materials** (Wood siding 003, Concrete 010...) are swapped
+  for the closest Render Mill library material by name and kind.
+- **Imported models from Lumion's library folder (.lib)**, e.g.
+  `Documents\Lumion 2026\Library\Kapp.lib`, open like any other model
+  (Import model or Start from a model).
+
+The file format isn't published, so it was worked out from your own files;
+everything is read, nothing is changed. Large scenes load in a few seconds.
 
 ## What's new in 0.14 — match materials from a photo
 

@@ -85,6 +85,11 @@ pub fn load_world(input: &str) -> Result<World> {
             w.load_model_now(&target)?;
         }
         w
+    } else if crate::lumion::is_scene(Path::new(input)) {
+        let mut w = World::new();
+        let r = w.open_lumion_scene(Path::new(input))?;
+        eprintln!("{}", r.summary());
+        w
     } else {
         let mut w = World::new();
         w.load_model_now(Path::new(input))?;

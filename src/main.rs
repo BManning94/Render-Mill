@@ -131,6 +131,32 @@ fn main() {
         }
         return;
     }
+    if args.first().map(String::as_str) == Some("--model-info") {
+        // --model-info <file>: per-material triangle counts and bounds after import.
+        let Some(f) = args.get(1) else { std::process::exit(2) };
+        let path = std::path::Path::new(f);
+        match lumencraft::import::load(path, &lumencraft::import::ImportSettings { recenter: false, ..lumencraft::import::ImportSettings::default_for(path) }) {
+            Ok(m) => {
+                let mut by: std::collections::BTreeMap<String, (usize, glam::Vec3, glam::Vec3)> = Default::default();
+                for (_, md) in &m.meshes {
+                    let e = by.entry(md.material.clone()).or_insert((0, glam::Vec3::splat(f32::MAX), glam::Vec3::splat(f32::MIN)));
+                    e.0 += md.indices.len() / 3;
+                    for p in &md.positions {
+                        e.1 = e.1.min(*p);
+                        e.2 = e.2.max(*p);
+                    }
+                }
+                for (k, (t, lo, hi)) in by {
+                    println!("{t:8} tris  {k}  [{:.2} {:.2} {:.2}] .. [{:.2} {:.2} {:.2}]", lo.x, lo.y, lo.z, hi.x, hi.y, hi.z);
+                }
+            }
+            Err(e) => {
+                eprintln!("{e}");
+                std::process::exit(1);
+            }
+        }
+        return;
+    }
     if args.first().map(String::as_str) == Some("--match-photo") {
         // --match-photo <photo> <texture folder> [<out overlay.png>]: regions and closest textures.
         let (Some(photo), Some(dir)) = (args.get(1), args.get(2)) else {

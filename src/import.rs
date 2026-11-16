@@ -96,7 +96,10 @@ impl ImportSettings {
             // glTF is Y-up meters by spec.
             _ => (UpAxis::Y, Units::Meters),
         };
-        Self { up, units, recenter: true, offset: None, texture_dirs: Vec::new() }
+        // Lumion scenes: keep Lumion's coordinates so models, objects and
+        // cameras stay where they were.
+        let recenter = !matches!(ext.as_str(), "lsf" | "lqf");
+        Self { up, units, recenter, offset: None, texture_dirs: Vec::new() }
     }
 
     pub fn basis_with(&self, hints: FileHints) -> Mat3 {
@@ -128,7 +131,7 @@ pub struct ImportedModel {
 }
 
 pub fn is_supported(path: &Path) -> bool {
-    matches!(ext_of(path).as_str(), "gltf" | "glb" | "obj" | "fbx")
+    matches!(ext_of(path).as_str(), "gltf" | "glb" | "obj" | "fbx" | "lsf" | "lqf" | "lib")
 }
 
 /// Raw loader output: individual parts in the file's own coordinates.
@@ -149,16 +152,32 @@ pub fn load(path: &Path, settings: &ImportSettings) -> Result<ImportedModel> {
 
 fn load_unguarded(path: &Path, settings: &ImportSettings) -> Result<ImportedModel> {
     let mut textures = TextureResolver::new(path, &settings.texture_dirs);
-    let (mut parts, materials, hints) = match ext_of(path).as_str() {
+    let (parts, materials, hints) = match ext_of(path).as_str() {
         "gltf" | "glb" => load_gltf(path)?,
         "obj" => load_obj(path, &mut textures)?,
         "fbx" => {
             let f = crate::fbx::load(path, &mut textures)?;
             (f.meshes.into_iter().map(|(_, m)| m).collect(), f.materials, f.hints)
         }
+        // Lumion: imported models from its library, and saved scenes (Y-up metres).
+        "lib" => {
+            let m = crate::lumion::read_model_file(path)?;
+            (m.meshes, m.materials, FileHints { up: Some(UpAxis::Y), scale_to_m: Some(1.0) })
+        }
+        "lsf" | "lqf" => {
+            let s = crate::lumion::read_scene(path)?;
+            anyhow::ensure!(!s.instances.is_empty(), "this Lumion scene has no imported models Render Mill can read");
+            let (p, m) = crate::lumion::scene_meshes(&s);
+            (p, m, FileHints { up: Some(UpAxis::Y), scale_to_m: Some(1.0) })
+        }
         _ => anyhow::bail!("Unsupported file type: {}", path.display()),
     };
+    Ok(finish(parts, materials, hints, settings, textures.missing))
+}
 
+/// Shared tail of every importer: axes/units, recentring, normals and
+/// chunking into draw-friendly pieces.
+pub fn finish(mut parts: Vec<MeshData>, materials: Vec<Material>, hints: FileHints, settings: &ImportSettings, missing_textures: Vec<String>) -> ImportedModel {
     // Unit + axis conversion.
     let basis = settings.basis_with(hints);
     let nbasis = basis.inverse().transpose();
@@ -202,7 +221,7 @@ fn load_unguarded(path: &Path, settings: &ImportSettings) -> Result<ImportedMode
 
     let transparent: std::collections::HashSet<&str> = materials.iter().filter(|m| m.params.kind.is_transparent()).map(|m| m.name.as_str()).collect();
     let meshes = chunk(parts, &transparent);
-    Ok(ImportedModel { meshes, materials, offset, missing_textures: textures.missing })
+    ImportedModel { meshes, materials, offset, missing_textures }
 }
 
 /// Group parts by (material, spatial cell). One draw per chunk keeps draw

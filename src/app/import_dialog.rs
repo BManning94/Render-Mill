@@ -27,7 +27,7 @@ impl ImportDialog {
 impl LumenApp {
     /// Pick a model file, then show the import dialog for it.
     pub(super) fn ask_import(&mut self, as_object: bool) {
-        let dlg = rfd::FileDialog::new().add_filter("3D model", &["fbx", "gltf", "glb", "obj"]);
+        let dlg = rfd::FileDialog::new().add_filter("3D model", &["fbx", "gltf", "glb", "obj", "lib"]);
         if as_object {
             // Library objects: several files can be added in one go.
             let Some(mut files) = dlg.pick_files() else { return };

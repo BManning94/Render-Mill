@@ -122,8 +122,13 @@ impl LumenApp {
                 self.start_page = None;
             }
             if widgets::flat_button(ui, Some(Icon::Folder), "Load", false, w).clicked() {
-                if let Some(p) = rfd::FileDialog::new().add_filter("Render Mill project", &["lcproj"]).pick_file() {
-                    self.open_project(p);
+                if let Some(p) = rfd::FileDialog::new()
+                    .add_filter("Render Mill or Lumion project", &["lcproj", "lsf", "lqf"])
+                    .add_filter("Render Mill project", &["lcproj"])
+                    .add_filter("Lumion scene", &["lsf", "lqf"])
+                    .pick_file()
+                {
+                    self.open_any(p);
                     self.start_page = None;
                 }
             }

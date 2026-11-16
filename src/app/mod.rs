@@ -254,6 +254,7 @@ pub struct LumenApp {
     photo_match: Option<photo_match::PhotoMatch>,
     /// Textures dropped this frame, freed next frame (after they were drawn).
     retired_textures: Vec<egui::TextureHandle>,
+    pending_lumion_hints: Vec<(String, String)>,
     photo_lock: bool,
     movie: movie::MovieState,
     rt: raytrace::RtState,
@@ -392,6 +393,7 @@ impl LumenApp {
             import_dialog: None,
             photo_match: None,
             retired_textures: Vec::new(),
+            pending_lumion_hints: Vec::new(),
             photo_lock: false,
             movie: movie::MovieState::default(),
             rt: raytrace::RtState::default(),
@@ -424,7 +426,7 @@ impl LumenApp {
         app.models = crate::library::scan_models_labeled(&app.settings.imported_models, &app.settings.model_labels);
         app.start_server();
         match open {
-            Some(p) if p.extension().is_some_and(|e| e == "lcproj") => app.open_project(p),
+            Some(p) if p.extension().is_some_and(|e| e == "lcproj") || crate::lumion::is_scene(&p) => app.open_any(p),
             // A photo: start screen, then the material match for it.
             Some(p) if crate::import::is_image(&p) => {
                 app.start_page = Some(start::StartPage::Home);
@@ -468,6 +470,11 @@ impl LumenApp {
                 self.push_log(format!("Material library: {} built-in, {} from your folders", lib.len() - n_user, n_user));
                 self.library = lib;
                 self.library_rx = None;
+                let hints = std::mem::take(&mut self.pending_lumion_hints);
+                if !hints.is_empty() {
+                    let n = self.apply_lumion_hints(&hints);
+                    self.push_log(format!("{n} Lumion library material(s) matched to Render Mill library materials"));
+                }
             }
         }
     }
@@ -609,6 +616,8 @@ impl LumenApp {
                 images.extend(crate::texlib::scan_folder(p));
             } else if crate::import::is_image(p) {
                 images.push(p.clone());
+            } else if crate::lumion::is_scene(p) {
+                self.open_lumion(p.clone());
             } else if crate::import::is_supported(p) {
                 self.start_file_sync(p.clone());
             }
@@ -768,6 +777,71 @@ impl LumenApp {
         if self.file_sync.take().is_some() {
             self.push_log("LiveSync paused. The model stays in the scene.");
         }
+    }
+
+    /// Open a Render Mill project or a Lumion scene.
+    fn open_any(&mut self, path: PathBuf) {
+        if crate::lumion::is_scene(&path) {
+            self.open_lumion(path);
+        } else {
+            self.open_project(path);
+        }
+    }
+
+    /// Open a Lumion scene as a new project.
+    fn open_lumion(&mut self, path: PathBuf) {
+        let t0 = Instant::now();
+        self.new_project();
+        match self.world.open_lumion_scene(&path) {
+            Ok(r) => {
+                self.start_page = None;
+                self.push_log(format!("{} - opened in {:.1}s", r.summary(), t0.elapsed().as_secs_f32()));
+                if self.library_rx.is_some() {
+                    // The library is still being indexed: match once it's ready.
+                    self.pending_lumion_hints = r.library_hints.clone();
+                } else {
+                    let hinted = self.apply_lumion_hints(&r.library_hints);
+                    if hinted > 0 {
+                        self.push_log(format!("{hinted} Lumion library material(s) matched to Render Mill library materials"));
+                    }
+                }
+                if !r.skipped.is_empty() {
+                    let list: Vec<String> = r.skipped.iter().take(6).map(|(n, c)| format!("{n} x{c}")).collect();
+                    self.push_log(format!("Not brought over: {}", list.join(", ")));
+                }
+                self.remember_recent(&path);
+                self.last_rendered = None;
+            }
+            Err(e) => self.push_log(format!("Could not open {}: {e}", path.display())),
+        }
+    }
+
+    /// Lumion library materials can't be copied: put the closest Render Mill
+    /// library material on those surfaces instead (by name and kind).
+    fn apply_lumion_hints(&mut self, hints: &[(String, String)]) -> usize {
+        let mut n = 0;
+        for (material, hint) in hints {
+            let cat = crate::library::guess_category(hint);
+            let words: Vec<String> = hint.to_lowercase().split(|c: char| !c.is_alphabetic()).filter(|w| w.len() > 2).map(str::to_string).collect();
+            let best = self
+                .library
+                .iter()
+                .filter(|m| m.set.color.is_some())
+                .map(|m| {
+                    let name = m.name.to_lowercase();
+                    let score = (m.category == cat && cat != "Other") as i32 * 3
+                        + words.iter().filter(|w| name.contains(w.as_str()) || m.tags.iter().any(|t| t.contains(w.as_str()))).count() as i32;
+                    (score, m)
+                })
+                .filter(|(s, _)| *s >= 3)
+                .max_by_key(|(s, _)| *s)
+                .map(|(_, m)| m.clone());
+            if let Some(m) = best {
+                self.apply_texture_set(material, &m.set);
+                n += 1;
+            }
+        }
+        n
     }
 
     fn open_project(&mut self, path: PathBuf) {
