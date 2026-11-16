@@ -602,7 +602,7 @@ impl LumenApp {
                 theme::panel_frame().show(ui, |ui| {
                     ui.label(RichText::new("Drop to import").heading());
                     let target = self.mat.as_ref().map(|m| format!("Images are added to Custom materials and applied to \"{}\".", m.name));
-                    ui.label(target.unwrap_or_else(|| "Images are added to Custom materials. FBX/glTF/OBJ files are imported as the model.".into()));
+                    ui.label(target.unwrap_or_else(|| "Images are added to Custom materials. FBX/DAE/glTF/OBJ files are imported as the model.".into()));
                 });
             });
         }

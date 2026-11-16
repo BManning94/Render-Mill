@@ -328,7 +328,7 @@ impl LumenApp {
             self.save_project(true);
         }
         ui.separator();
-        if item(ui, Icon::Import, "Import model (FBX, glTF, OBJ)...") {
+        if item(ui, Icon::Import, "Import model (FBX, DAE, glTF, OBJ)...") {
             self.open_model_dialog();
         }
         if item(ui, Icon::Photo, "Match materials from a photo...") {
@@ -530,7 +530,7 @@ impl LumenApp {
         });
         ui.horizontal(|ui| {
             if widgets::flat_button(ui, Some(Icon::Import), "Import model...", true, 140.0)
-                .on_hover_text("Revit: File > Export > FBX. Also glTF/GLB and OBJ.")
+                .on_hover_text("Revit: File > Export > FBX. Also COLLADA (.dae), glTF/GLB and OBJ.")
                 .clicked()
             {
                 self.open_model_dialog();

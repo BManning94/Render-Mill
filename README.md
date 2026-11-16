@@ -1,4 +1,4 @@
-# Render Mill 0.15.1
+# Render Mill 0.16.0
 
 A real-time architectural renderer written in Rust (wgpu + egui), modeled on Lumion's workflow and interface.
 
@@ -55,6 +55,23 @@ Extract `lumencraft-0.7.0.zip` and every `lumencraft-library-…-0.7.0.zip` and 
 **Updating:** extract the newest `render-mill-<version>.zip` (`lumencraft-<version>.zip` up to 0.13.0) into the same place. From 0.13.1 run `RenderMill.exe`.
 
 **Updating from 0.7:** extract `lumencraft-0.8.0.zip` and both `lumencraft-denoiser-…-0.8.0.zip` parts into the same place as before, replacing `lumencraft.exe`. The library and models from 0.7 are unchanged. The denoiser parts add a `LumenCraft\denoiser\` folder (Intel Open Image Denoise, Apache 2.0); its large DLL is split in two and joined automatically the first time you render.
+
+## What's new in 0.16 — COLLADA (.dae) models
+
+Render Mill opens COLLADA `.dae` files: Import model, Start from a Revit / 3D
+model, or drag the file onto the window. This is the format Lumion LiveSync
+for Revit, SketchUp, ArchiCAD and 3ds Max export.
+
+- Units and up axis come from the file, so models arrive at the right size and
+  the right way up (Units and Up axis in the import dialog can override them).
+- Node hierarchies, instanced parts and per-object material assignments.
+- Colours, textures, transparency (glass) and shininess. For files from
+  Lumion's Revit exporter, its extra settings are used too: albedo colour and
+  map, normal map, roughness, reflectiveness and material type.
+- Textures are found from the paths in the file, or by file name next to the
+  .dae (for example the `<model>_Textures` folder) if it has been moved.
+- Like FBX, a `.dae` imported as the building is watched: export again and the
+  scene updates.
 
 ## What's new in 0.15 — open Lumion files
 

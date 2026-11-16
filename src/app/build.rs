@@ -562,7 +562,7 @@ impl LumenApp {
                         }
                     }
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                        if widgets::tool_button(ui, Icon::Import, vec2(30.0, 30.0), false, "Import 3D model (FBX, OBJ, glTF) as a library object").clicked() {
+                        if widgets::tool_button(ui, Icon::Import, vec2(30.0, 30.0), false, "Import 3D model (FBX, DAE, OBJ, glTF) as a library object").clicked() {
                             import_clicked = true;
                         }
                     });
@@ -592,7 +592,7 @@ impl LumenApp {
                     let msg = if cat == ObjCat::Favourites {
                         "Star objects in the preview card to collect them here."
                     } else if sub_name == "Imported" {
-                        "Import your own FBX, OBJ or glTF models with the button above. They stay in this list for every project."
+                        "Import your own FBX, DAE, OBJ or glTF models with the button above. They stay in this list for every project."
                     } else {
                         "Nothing found."
                     };

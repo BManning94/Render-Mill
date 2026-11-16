@@ -91,6 +91,8 @@ impl ImportSettings {
         let (up, units) = match ext.as_str() {
             // FBX declares its own units/axis (Revit writes feet, Z-up).
             "fbx" => (UpAxis::FromFile, Units::FromFile),
+            // COLLADA declares <unit> and <up_axis> in its header.
+            "dae" => (UpAxis::FromFile, Units::FromFile),
             // Revit OBJ exporters write internal units (feet), Z-up.
             "obj" => (UpAxis::Z, Units::Feet),
             // glTF is Y-up meters by spec.
@@ -131,7 +133,7 @@ pub struct ImportedModel {
 }
 
 pub fn is_supported(path: &Path) -> bool {
-    matches!(ext_of(path).as_str(), "gltf" | "glb" | "obj" | "fbx" | "lsf" | "lqf" | "lib")
+    matches!(ext_of(path).as_str(), "gltf" | "glb" | "obj" | "fbx" | "dae" | "lsf" | "lqf" | "lib")
 }
 
 /// Raw loader output: individual parts in the file's own coordinates.
@@ -155,6 +157,7 @@ fn load_unguarded(path: &Path, settings: &ImportSettings) -> Result<ImportedMode
     let (parts, materials, hints) = match ext_of(path).as_str() {
         "gltf" | "glb" => load_gltf(path)?,
         "obj" => load_obj(path, &mut textures)?,
+        "dae" => crate::collada::load(path, &mut textures)?,
         "fbx" => {
             let f = crate::fbx::load(path, &mut textures)?;
             (f.meshes.into_iter().map(|(_, m)| m).collect(), f.materials, f.hints)

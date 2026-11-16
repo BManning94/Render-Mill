@@ -2,6 +2,7 @@
 pub mod app;
 pub mod bench;
 pub mod bvh;
+pub mod collada;
 pub mod demo;
 pub mod denoise;
 pub mod env;
