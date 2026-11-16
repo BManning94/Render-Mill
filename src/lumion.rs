@@ -679,14 +679,35 @@ fn substitute_by_name(type_guid: &str) -> Option<ObjectKind> {
     let l = type_guid.to_lowercase();
     let has = |w: &[&str]| w.iter().any(|x| l.contains(x));
     // Landscape painting, grass clumps, text, effects: Render Mill has its own.
-    if l.ends_with(".llm") || l.ends_with(".spe") || has(&["backdrop", "grass", "terrain", "landscape", "cloud", "fog", "fire", "smoke", "water"]) {
+    // Grass clumps, landscape paint, text and effects: Render Mill has its own.
+    // (".llm" is also used for Lumion's ray-traced trees, so go by name.)
+    if l.ends_with(".spe")
+        || has(&[
+            "backdrop",
+            "grass",
+            "terrain",
+            "landscape",
+            "cloud",
+            "fog",
+            "fire",
+            "smoke",
+            "water",
+            "dirt",
+            "paint",
+            "plaster",
+            "soil",
+            "gravel",
+            "mud",
+            "sand",
+        ])
+    {
         return None;
     }
     Some(if has(&["person", "people", "man_", "woman", "boy", "girl", "child", "human", "walker", "worker", "kid"]) {
         ObjectKind::Person
     } else if has(&["car", "vehicle", "suv", "sedan", "truck", "van_", "pickup", "jeep", "taxi"]) {
         ObjectKind::Car
-    } else if has(&["pine", "spruce", "fir_", "cedar", "conifer", "cypress", "juniper", "thuja", "larch", "sequoia"]) {
+    } else if has(&["pine", "spruce", "fir_", "cedar", "conifer", "cypress", "juniper", "thuja", "larch", "sequoia", "redwood"]) {
         ObjectKind::Conifer
     } else if has(&[
         "shrub", "bush", "hedge", "gaura", "fern", "lavender", "creeper", "flower", "plant", "grass_", "boxwood", "rose", "hosta", "agave", "tea_tree",
@@ -710,7 +731,26 @@ fn substitute_by_name(type_guid: &str) -> Option<ObjectKind> {
     } else if has(&["table", "desk"]) {
         ObjectKind::Table
     } else if has(&[
-        "tree", "oak", "maple", "birch", "olive", "hickory", "rowan", "ash_", "elm", "palm", "willow", "linden", "poplar", "beech", "magnolia", "cherry",
+        "tree",
+        "oak",
+        "maple",
+        "birch",
+        "olive",
+        "hickory",
+        "rowan",
+        "ash_",
+        "elm",
+        "palm",
+        "willow",
+        "linden",
+        "poplar",
+        "beech",
+        "magnolia",
+        "cherry",
+        "baobab",
+        "acacia",
+        "eucalyptus",
+        "_rt.",
     ]) {
         ObjectKind::Tree
     } else if l.ends_with(".ltm") {
@@ -819,7 +859,9 @@ pub fn read_scene_bytes(d: &[u8]) -> Result<LumionScene> {
             (dict.floats(&k("cameraStatic.pos")), dict.float(&k("cameraStatic.heading")), dict.float(&k("cameraStatic.pitch")))
         {
             let fwd = Vec3::new(h.sin() * pitch.cos(), pitch.sin(), h.cos() * pitch.cos());
-            let fov = dict.float(&k("cameraStatic.zoomfactor")).unwrap_or(60.0);
+            // Photo views store the lens as a focal length in mm (35 mm film).
+            let mm = dict.float(&k("cameraStatic.zoomfactor")).unwrap_or(30.0).max(1.0);
+            let fov = 2.0 * (18.0 / mm).atan().to_degrees();
             cameras.push(LumionCamera {
                 name: format!("Lumion view {}", cameras.len() + 1),
                 camera: camera_from(flip(Vec3::new(p[0], p[1], p[2])), flip(fwd), fov),
@@ -967,6 +1009,10 @@ mod tests {
         assert_eq!(substitute_by_name("white_gaura_004.ltm"), Some(ObjectKind::Shrub));
         assert_eq!(substitute_by_name("am_260_010_pot.lmod"), Some(ObjectKind::Planter));
         assert_eq!(substitute_by_name("simple_grass_006.llm"), None);
+        assert_eq!(substitute_by_name("japanese_pine-1_rt.llm"), Some(ObjectKind::Conifer));
+        assert_eq!(substitute_by_name("africanbaobab_rt.llm"), Some(ObjectKind::Tree));
+        assert_eq!(substitute_by_name("stone_flat_001.lmod"), Some(ObjectKind::Boulder));
+        assert_eq!(substitute_by_name("dirt_002_c.llm"), None);
         assert_eq!(substitute_by_name("am250_065.ltm"), Some(ObjectKind::Shrub));
         assert_eq!(substitute_by_name("backdrop_hills_001_c.lmod"), None);
     }
