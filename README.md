@@ -451,7 +451,7 @@ cargo build --release --target x86_64-pc-windows-gnu   # cross-compile for Windo
 ## License and credits
 
 <!-- Add a LICENSE file and name it here. -->
-Copyright (c) 2026 Brayden Manning.
+Copyright (c) 2026 Cerium Built.
 
 Bundled content keeps its own licence:
 
@@ -470,5 +470,5 @@ independent project and is not affiliated with, sponsored by or endorsed by any 
 describe the workflow it follows and the files it reads.</sub>
 
 <p align="center">
-  <sub>Made by Brayden Manning, in pure Rust.</sub>
+  <sub>Made by Cerium Built, in pure Rust.</sub>
 </p>
