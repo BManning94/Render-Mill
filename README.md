@@ -9,7 +9,7 @@
   furniture and lights, paint its surfaces from a library of real-world PBR materials, and walk around it in real time.
   Re-export from Revit and the scene updates in place, keeping your materials, objects and cameras. When the view is
   right, render a ray-traced, AI-denoised photo or a movie.<br>
-  <i>By Brayden Manning.</i>
+  <i>By Cerium Built.</i>
 </p>
 
 <p align="center">
